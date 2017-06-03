@@ -5,7 +5,11 @@ using UnityEngine;
 public class HeroRabbit : MonoBehaviour
 {
     public float speed = 1.5f;
-
+    public static HeroRabbit lastRabit = null;
+    void Awake()
+    {
+        lastRabit = this;
+    }
     Rigidbody2D myBody = null;
     bool isGrounded = false;
     bool JumpActive = false;
@@ -14,7 +18,7 @@ public class HeroRabbit : MonoBehaviour
     public float MaxJumpTime = 2f;
     public float JumpSpeed = 2f;
     Transform heroParent = null;
-
+    bool isDead = false;
 
     public void enterRageMode()
     {
@@ -25,7 +29,8 @@ public class HeroRabbit : MonoBehaviour
     }
     public void die()
     {
-        StartCoroutine(this.rdie(0.5f));
+        isDead = true;
+        StartCoroutine(this.rdie(2));
     }
     
    public IEnumerator rdie(float duration)
@@ -59,6 +64,7 @@ public class HeroRabbit : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        isDead = false;
        // GetComponent<Animator>().SetBool("dead", false);
         myBody = this.GetComponent<Rigidbody2D>();
         this.heroParent = this.transform.parent;
@@ -165,6 +171,44 @@ public class HeroRabbit : MonoBehaviour
             //Оскільки вони тепер відносно іншого об’єкта
             //повертаємо кролика в ті самі глобальні координати
             obj.transform.position = pos;
+        }
+    }
+    public void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (!this.isDead)
+        {
+            Orc1 orc = collider.gameObject.GetComponent<Orc1>();
+            Orc2 orc2 = collider.gameObject.GetComponent<Orc2>();
+            if (orc != null)
+            {
+                if (!orc.isOrcDead())
+                {
+                    if(collider == orc.bodyCollider)
+                    {
+                        orc.GetComponent<Animator>().SetTrigger("attack");
+                        this.die();
+                    } else if(collider == orc.headCollider)
+                    {
+                        orc.die();
+                    }
+                }
+            }
+
+            if (orc2 != null)
+            {
+                if (!orc2.isOrcDead())
+                {
+                    if (collider == orc2.bodyCollider)
+                    {
+                       // orc2.GetComponent<Animator>().SetTrigger("attack");
+                      //  this.die();
+                    }
+                    else if (collider == orc2.headCollider)
+                    {
+                        orc2.die();
+                    }
+                }
+            }
         }
     }
 }
