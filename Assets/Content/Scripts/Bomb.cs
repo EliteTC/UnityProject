@@ -12,7 +12,7 @@ public class Bomb : Collectable {
 
             rabbit.exitRageMode();
         }
-        else rabbit.die();
+        else rabbit.removeOneHealth();
         this.CollectedHide();
     }
 }

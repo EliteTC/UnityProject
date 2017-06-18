@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4333028148334412}
   - component: {fileID: 212447997111043772}
   - component: {fileID: 68456529007543128}
+  - component: {fileID: 114250033279737148}
   m_Layer: 8
   m_Name: MovingPlatform
   m_TagString: Untagged
@@ -58,6 +59,20 @@ EdgeCollider2D:
   m_Points:
   - {x: -1, y: 0}
   - {x: 1, y: 0}
+--- !u!114 &114250033279737148
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1709249174514868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61fafb6879254364ab178ed2f58be3fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MoveBy: {x: 0, y: 0, z: 0}
+  speed: {x: 0, y: 0, z: 0}
+  pause: 0
 --- !u!212 &212447997111043772
 SpriteRenderer:
   m_ObjectHideFlags: 1

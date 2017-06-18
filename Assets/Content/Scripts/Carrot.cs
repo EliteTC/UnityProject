@@ -11,7 +11,7 @@ public class Carrot : Collectable {
 
             rabbit.exitRageMode();
         }
-        else rabbit.die();
+        else rabbit.removeOneHealth();
         this.CollectedHide();
     }
     float my_direction = 0;

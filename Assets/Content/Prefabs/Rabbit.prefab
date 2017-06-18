@@ -117,10 +117,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cac2852c439d98b42aea97cbf0cd087b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 7
   isBig: 0
-  MaxJumpTime: 2
-  JumpSpeed: 5
+  MaxJumpTime: 3
+  JumpSpeed: 25
+  deathSound: {fileID: 8300000, guid: 7553580dee44e4f96b2efa5f4e5e17c3, type: 3}
+  goSound: {fileID: 8300000, guid: 0d024189a711c440997b2d9f341c8dd0, type: 3}
+  jumpSound: {fileID: 8300000, guid: 4678dc960a2b949329a55d696cf4ec68, type: 3}
+  healthLimit: 2
 --- !u!212 &212123198590738492
 SpriteRenderer:
   m_ObjectHideFlags: 1

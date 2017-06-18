@@ -4,9 +4,26 @@ using UnityEngine;
 
 public class Gem : Collectable {
 
-    protected override void OnRabbitHit(HeroRabbit rabbit)
+    public static int count = 0;
+    public int id;
+
+    void Start()
     {
-        // Level.current.addGem(1);
+        id = count;
+        ++count;
+
+    }
+
+    public static void setCountZero()
+    {
+        count = 0;
+    }
+
+
+    public int getId() { return id; }
+    protected override void OnRabbitHit(HeroRabbit rabit)
+    {
+        LevelController.current.addGem(this);
         this.CollectedHide();
     }
 }

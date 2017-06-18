@@ -20,6 +20,15 @@ public class HeroRabbit : MonoBehaviour
     Transform heroParent = null;
     bool isDead = false;
 
+    public AudioClip deathSound = null;
+    public AudioClip goSound = null;
+    public AudioClip jumpSound = null;
+    AudioSource deathSource = null;
+    AudioSource goSource = null;
+    AudioSource jumpSource = null;
+    public int healthLimit = 2;
+    int currentHealth = 1;
+
     public void enterRageMode()
     {
         if (!isBig)
@@ -30,7 +39,13 @@ public class HeroRabbit : MonoBehaviour
     public void die()
     {
         isDead = true;
-        StartCoroutine(this.rdie(2));
+        
+            if (SoundManager.Instance.isSoundOn())
+            {
+                deathSource.Play();
+            }
+        
+            StartCoroutine(this.rdie(0.5f));
     }
     
    public IEnumerator rdie(float duration)
@@ -38,11 +53,13 @@ public class HeroRabbit : MonoBehaviour
         //Perform action ...
         //Wait
         GetComponent<Animator>().SetBool("dead", true);
-       
+      
+        currentHealth = 1;
         yield return new WaitForSeconds(duration);
         GetComponent<Animator>().SetBool("dead", false);
         LevelController.current.onRabbitDeath(this);
-       
+      
+
         //Continue excution in few seconds
         //Other actions...
     }
@@ -65,10 +82,18 @@ public class HeroRabbit : MonoBehaviour
     void Start()
     {
         isDead = false;
-       // GetComponent<Animator>().SetBool("dead", false);
+        LevelController.current.setStartPosition(this.transform.position);
+        // GetComponent<Animator>().SetBool("dead", false);
         myBody = this.GetComponent<Rigidbody2D>();
         this.heroParent = this.transform.parent;
-        LevelController.current.setStartPosition(transform.position);
+        this.deathSource = gameObject.AddComponent<AudioSource>();
+        this.deathSource.clip = deathSound;
+        this.goSource = gameObject.AddComponent<AudioSource>();
+        this.goSource.spatialBlend = 1;
+        this.goSource.clip = goSound;
+        this.jumpSource = gameObject.AddComponent<AudioSource>();
+        this.jumpSource.clip = jumpSound;
+
     }
 
     // Update is called once per frame
@@ -81,6 +106,7 @@ public class HeroRabbit : MonoBehaviour
         RaycastHit2D hit = Physics2D.Linecast(from, to, layer_id);
         if (hit)
         {
+            if (!isGrounded && (SoundManager.Instance.isSoundOn())) jumpSource.Play();
             isGrounded = true;
             //Перевіряємо чи ми опинились на платформі
             if (hit.transform != null && hit.transform.GetComponent<MovingPlatform>() != null)
@@ -91,6 +117,7 @@ public class HeroRabbit : MonoBehaviour
         }
         else
         {
+            if (isGrounded && SoundManager.Instance.isSoundOn())  jumpSource.Play();
             isGrounded = false;
             //Ми в повітрі відліпаємо під платформи
             SetNewParent(this.transform, this.heroParent);
@@ -136,10 +163,22 @@ public class HeroRabbit : MonoBehaviour
        
         if (Mathf.Abs(value) > 0)
         {
+            if (SoundManager.Instance.isSoundOn() && !goSource.isPlaying && isGrounded)
+            {
+                goSource.Play();
+            }
+            else if (!isGrounded)
+            {
+                goSource.Stop();
+            }
             animator.SetBool("run", true);
         }
         else
         {
+            if (SoundManager.Instance.isSoundOn())
+            {
+                goSource.Stop();
+            }
             animator.SetBool("run", false);
         }
         if (Mathf.Abs(value) > 0)
@@ -173,6 +212,32 @@ public class HeroRabbit : MonoBehaviour
             obj.transform.position = pos;
         }
     }
+    public void addOneHealth()
+    {
+        if (currentHealth < healthLimit)
+        {
+            currentHealth++;
+        }
+        if (currentHealth == healthLimit)
+        {
+            
+        }
+    }
+
+    public void removeOneHealth()
+    {
+            if (currentHealth > 1)
+            {
+                currentHealth--;
+               
+            }
+            else
+            {
+            this.die();
+            }
+        
+    }
+    /*
     public void OnTriggerEnter2D(Collider2D collider)
     {
         if (!this.isDead)
@@ -211,4 +276,5 @@ public class HeroRabbit : MonoBehaviour
             }
         }
     }
+    */
 }

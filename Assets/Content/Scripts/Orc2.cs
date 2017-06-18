@@ -11,15 +11,17 @@ public class Orc2 : MonoBehaviour
     Transform heroParent = null;
     Vector3 pointA;
     Vector3 pointB;
+    public AudioClip attacSound = null;
+    AudioSource attacSource = null;
     public GameObject carrot;
     float last_carrot = 0;
     public float patrolDistance = 4;
     Mode mode;
     Mode prevMode;
-    public BoxCollider2D headCollider;
-    public BoxCollider2D bodyCollider;
+  //  public BoxCollider2D headCollider;
+   // public BoxCollider2D bodyCollider;
 
-    public void die()
+    private void die()
     {
         isDead = true;
         this.mode = Mode.Dead;
@@ -29,16 +31,18 @@ public class Orc2 : MonoBehaviour
     {
         return this.isDead;
     }
-    public IEnumerator orcdie(float duration)
+    private IEnumerator orcdie(float duration)
     {
         //Perform action ...
         //Wait
-        foreach (BoxCollider2D collider in this.GetComponents<BoxCollider2D>())
-        {
-            collider.enabled = false;
-        }
-        Destroy(this.myBody);
+        /*   foreach(BoxCollider2D collider in this.GetComponents<BoxCollider2D>())
+           {
+               collider.enabled = false;
+           }*/
+        // Destroy(this.myBody);
         GetComponent<Animator>().SetTrigger("die");
+        this.GetComponent<BoxCollider2D>().isTrigger = true;
+        if (myBody != null) Destroy(myBody);
 
         yield return new WaitForSeconds(duration);
 
@@ -56,6 +60,8 @@ public class Orc2 : MonoBehaviour
         mode = Mode.GoToB;
         pointA = this.transform.position;
         pointB = pointA;
+        this.attacSource = gameObject.AddComponent<AudioSource>();
+        this.attacSource.clip = attacSound;
         if (patrolDistance < 0)
         {
             pointA.x += patrolDistance;
@@ -89,6 +95,7 @@ public class Orc2 : MonoBehaviour
 
         if (this.mode == Mode.Dead)
         {
+            this.die();
             return 0;
         }
         if(this.mode == Mode.CarrotLeft)
@@ -144,7 +151,11 @@ public class Orc2 : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        if (this.mode == Mode.Dead)
+        {
+            this.die();
+            return ;
+        }
 
         Animator animator = GetComponent<Animator>();
         lauchCarrot();
@@ -215,6 +226,39 @@ public class Orc2 : MonoBehaviour
         }
         if(this.mode == Mode.CarrotLeft || this.mode == Mode.CarrotRight)
         this.mode = Mode.GoToA;
+    }
+    private IEnumerator attack(HeroRabbit rabit)
+    {
+        Animator animator = GetComponent<Animator>();
+
+       // animator.SetTrigger("attack");
+       // rabit.removeOneHealth();
+        yield return new WaitForSeconds(0.8f);
+
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (mode != Mode.Dead)
+        {
+            HeroRabbit rabit = collision.gameObject.GetComponent<HeroRabbit>();
+            if (rabit != null)
+            {
+                Vector3 rabit_pos = HeroRabbit.lastRabit.transform.position;
+                Vector3 my_pos = this.transform.position;
+               
+
+                if (Mathf.Abs(rabit_pos.y - my_pos.y) < 0.5f)
+                {
+                   // StartCoroutine(attack(rabit));
+                }
+                else if (Mathf.Abs(rabit_pos.y - my_pos.y) > 0.5f)
+                {
+                   mode = Mode.Dead;
+                }
+
+            }
+        }
     }
     static void SetNewParent(Transform obj, Transform new_parent)
     {
